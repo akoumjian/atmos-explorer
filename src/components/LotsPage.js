@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import LotCard from "./LotCard";
 import { fetchLots, selectAllLots } from "../store/lots";
+import { selectFavoritedLots } from "../store/favorites";
 
 const LotsPage = () => {
   const dispatch = useDispatch();
@@ -9,6 +10,9 @@ const LotsPage = () => {
   const lotsStatus = useSelector((state) => state.lots.status);
   const lotsError = useSelector((state) => state.lots.error);
   const [renderedLots, setRenderedLots] = useState(<div>Loading...</div>);
+  const favoritedLots = useSelector(selectFavoritedLots);
+
+  const [savedOnly, setSavedOnly] = useState(false);
 
   useEffect(() => {
     // Load initial data
@@ -25,22 +29,34 @@ const LotsPage = () => {
       content = <div>{lotsError}</div>;
     } else if (lotsStatus === "succeeded") {
       content = lots.map((lot) => {
+        if (savedOnly && !(lot.lotId in favoritedLots)) {
+          return;
+        }
         return <LotCard key={lot.lotId} lot={lot}></LotCard>;
       });
     }
     setRenderedLots(content);
-  }, [lotsStatus, lots, lotsError]);
+  }, [lotsStatus, lots, lotsError, favoritedLots, savedOnly]);
   return (
-    <div
-      style={{
-        width: "100%",
-        display: "flex",
-        flexWrap: "wrap",
-        padding: "2rem",
-        justifyContent: "space-between",
-      }}
-    >
-      {renderedLots}
+    <div>
+      <button
+        onClick={() => {
+          setSavedOnly(!savedOnly);
+        }}
+      >
+        Show Saved Lots
+      </button>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexWrap: "wrap",
+          padding: "2rem",
+          justifyContent: "space-between",
+        }}
+      >
+        {renderedLots}
+      </div>
     </div>
   );
 };

@@ -8,6 +8,14 @@ export const isLotFavorited = (state, lotId) => {
   return lotId in state.favorites.lots;
 };
 
+export const selectFavoritedPlans = (state) => {
+  return state.favorites.homePlans;
+};
+
+export const selectFavoritedLots = (state) => {
+  return state.favorites.lots;
+};
+
 export const favoritesSlice = createSlice({
   name: "favorites",
   initialState: {
